@@ -9,6 +9,8 @@ import SwiftUI
 
 struct PortfolioView: View {
     @EnvironmentObject var vm: HomeViewModel
+    @Environment(\.dismiss) private var dismiss
+
     @State private var selectedCoin:CoinModel? = nil
     @State var quantityText:String = ""
     @State var showCheckmark:Bool = false
@@ -53,7 +55,13 @@ struct PortfolioView: View {
             .navigationTitle("Edit Portfolio")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    XMarkView()
+                    Button {
+                        dismiss()
+                        print("Dismiss")
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.headline)
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     trailingToolBar
@@ -77,8 +85,12 @@ struct PortfolioView: View {
 extension PortfolioView {
     
     func saveButtonPressed (){
-       guard let coin = selectedCoin else {return}
+       guard
+        let coin = selectedCoin,
+        let amount = Double(quantityText)
+        else {return}
         
+        vm.updatePortfolio(coin: coin, amount: amount)
         
         withAnimation(.easeIn) {
             showCheckmark = true
@@ -98,6 +110,16 @@ extension PortfolioView {
         vm.searchField = ""
     }
     
+    func updateSelectedCoin(coin: CoinModel){
+        selectedCoin = coin
+        if let portfolioCon = vm.portofolioCoins.first(where: {$0.id == coin.id}),
+           let amount = portfolioCon.currentHoldings {
+           quantityText = "\(amount)"
+        } else {
+          quantityText = ""
+        }
+    }
+    
     var getCurrenttValue: Double {
         if  let quantity = Double(quantityText) {
             return quantity * (selectedCoin?.currentPrice ?? 0)
@@ -108,7 +130,7 @@ extension PortfolioView {
     private var coinLogoList : some View {
         ScrollView(.horizontal,showsIndicators: false, content: {
             LazyHStack (spacing: 10) {
-                ForEach(vm.allCoins) { coin in
+                ForEach(vm.searchField.isEmpty ? vm.portofolioCoins : vm.allCoins) { coin in
                     portfolioCoinView(coin: coin)
                         .frame(width: 75)
                         .padding(4)
@@ -118,7 +140,7 @@ extension PortfolioView {
                         )
                         .onTapGesture {
                             withAnimation {
-                                selectedCoin = coin
+                                updateSelectedCoin(coin: coin)
                             }
                             
                         }

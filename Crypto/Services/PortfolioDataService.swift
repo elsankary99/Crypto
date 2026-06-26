@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 import CoreData
 
 
@@ -27,12 +28,65 @@ class PortfolioDataService {
             }
         }
        context = container.viewContext
+       get()
     }
     
     
-    func addEntity(coin:CoinModel,amount:Double){
+    // MARK: PUBLIC
+    
+    func updatePortfolio(coin: CoinModel , amount: Double){
+        if let entity = portfolioEntities.first (where: {$0.coinID == coin.id}){
+            if amount > 0 {
+                update(entity: entity, amount: amount)
+            } else {
+                delete(entity: entity)
+            }
+ 
+        } else {
+            add(coin: coin, amount: amount)
+        }
+    }
+    
+    // MARK: PRIVATE
+    
+   private func add(coin: CoinModel , amount: Double){
        let portfolio = PortfolioEntity(context: context)
         portfolio.coinID = coin.id
         portfolio.amount = amount
+        applyChanges()
     }
+    
+    private func update(entity: PortfolioEntity , amount: Double){
+        entity.amount = amount
+        applyChanges()
+    }
+    
+   private func get(){
+      let request = NSFetchRequest<PortfolioEntity>(entityName: entityName)
+        do {
+        portfolioEntities = try context.fetch(request)
+        } catch let error {
+            print("Error Fetching Entities. \(error)")
+        }
+    }
+    
+    private func delete(entity:PortfolioEntity){
+        context.delete(entity)
+        applyChanges()
+    }
+    
+    
+    private func save(){
+        do {
+            try context.save()
+        } catch let error {
+            print("Error Saving Entity.\(error)")
+        }
+     }
+    
+    private func applyChanges(){
+        save()
+        get()
+    }
+    
 }

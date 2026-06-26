@@ -19,6 +19,7 @@ struct HomeView: View {
                 .ignoresSafeArea()
                 .sheet(isPresented: $showPortfolioSheet) {
                     PortfolioView()
+                        .environmentObject(vm)
                 }
             VStack {
                 homeHeader
@@ -95,7 +96,7 @@ extension HomeView {
     
     private var portofolioCoinsList:some View {
         List {
-            ForEach(vm.allCoins) { coin in
+            ForEach(vm.portofolioCoins) { coin in
                 CoinRowView(coin: coin, showHoaldingColumn: true)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 4))
             }
