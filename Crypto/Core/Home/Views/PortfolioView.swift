@@ -20,7 +20,7 @@ struct PortfolioView: View {
             
             ScrollView {
                 VStack(alignment: .leading) {
-                    SearchBarView(searchText: $vm.searchField)
+                    SearchBarView(searchText: $vm.searchText)
                     coinLogoList
                     if let currentCoin = selectedCoin {
                     VStack(spacing:20) {
@@ -67,7 +67,7 @@ struct PortfolioView: View {
                     trailingToolBar
                 }
             }
-            .onChange(of: vm.searchField) { oldValue, newValue in
+            .onChange(of: vm.searchText) { oldValue, newValue in
                 if newValue == "" {
                     removeSelectedCoin()
                 }
@@ -107,7 +107,7 @@ extension PortfolioView {
     
     func removeSelectedCoin () {
         selectedCoin = nil
-        vm.searchField = ""
+        vm.searchText = ""
     }
     
     func updateSelectedCoin(coin: CoinModel){
@@ -130,7 +130,7 @@ extension PortfolioView {
     private var coinLogoList : some View {
         ScrollView(.horizontal,showsIndicators: false, content: {
             LazyHStack (spacing: 10) {
-                ForEach(vm.searchField.isEmpty ? vm.portofolioCoins : vm.allCoins) { coin in
+                ForEach(vm.searchText.isEmpty ? vm.portofolioCoins : vm.allCoins) { coin in
                     portfolioCoinView(coin: coin)
                         .frame(width: 75)
                         .padding(4)

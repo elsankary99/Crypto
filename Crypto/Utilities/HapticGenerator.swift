@@ -6,3 +6,12 @@
 //
 
 import Foundation
+import SwiftUI
+
+class HapticGenerator {
+    static private let generator = UINotificationFeedbackGenerator(view: .appearance())
+    
+    static func notification(type: UINotificationFeedbackGenerator.FeedbackType){
+        generator.notificationOccurred(type)
+    }
+}
