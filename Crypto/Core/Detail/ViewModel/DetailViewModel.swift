@@ -12,6 +12,9 @@ class DetailViewModel: ObservableObject {
     @Published var overviewStatstics: [StatisticModel] = []
     @Published var additionalStatstics: [StatisticModel] = []
     @Published var coin: CoinModel
+    @Published var coinDescription: String? = nil
+    @Published var websiteURL: String? = nil
+    @Published var redditURL: String? = nil
 
     private let coinDetailDataService :CoinDetailDataService
     private var cancellables = Set<AnyCancellable>()
@@ -37,6 +40,10 @@ class DetailViewModel: ObservableObject {
     }
     
     func mapToStatistic (coinDetailModel:CoinDetailModel?, coinModel:CoinModel) -> (overview: [StatisticModel], additional:[StatisticModel]) {
+        coinDescription = coinDetailModel?.description?.en
+        websiteURL = coinDetailModel?.links?.homepage?.first
+        redditURL = coinDetailModel?.links?.subredditUrl
+        
        let overviewArray = createOverviewArray(coinModel: coinModel)
        let additionalArray = createadditionalArray(coinDetailModel: coinDetailModel, coinModel: coinModel)
         return (overviewArray, additionalArray)
